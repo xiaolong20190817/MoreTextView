@@ -170,7 +170,7 @@ public final class UtilMoreText {
 
         @Override
         public void updateDrawState(TextPaint ds) {
-            if (mSpanTextColor == null) {
+            if (mSpanTextColor != null) {
                 ds.setColor(mSpanTextColor);
             } else {
                 ds.setColor(ds.linkColor);
