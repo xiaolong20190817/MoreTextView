@@ -144,7 +144,7 @@ public final class UtilMoreText {
      */
     @SuppressLint("NewApi")
     public int getLineMaxNumber() {
-        //获取用来测量的字符串的长度
+        //获取用来测量的字符串的长度的
         int str_length = mOriMsg.length();
         //获取当前字符串所占的宽度   像素单位
         int total_str_dpi = (int) mTextView.getPaint().measureText(mOriMsg);
