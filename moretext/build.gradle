@@ -28,9 +28,9 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
-def siteUrl = 'https://github.com/XBean1024'      // 项目的主页   这个是说明，可随便填
-def gitUrl = 'https://github.com/XBean1024'      // Git仓库的url  这个是说明，可随便填
-group = "com.smart.moretext"    // 这里是groupId ,必须填写  一般填你唯一的包名，一旦写好好，就不要修改了
+def siteUrl = 'https://github.com/xiaolong20190817/MoreTextView'      // 项目的主页   这个是说明，可随便填
+def gitUrl = 'https://github.com/xiaolong20190817/MoreTextView'      // Git仓库的url  这个是说明，可随便填
+group = "com.smart.moretext.MoreTextView"    // 这里是groupId ,必须填写  一般填你唯一的包名，一旦写好好，就不要修改了
 
 install {
     repositories.mavenInstaller {
@@ -50,9 +50,9 @@ install {
                 }
                 developers {
                     developer {
-                        id 'ouyangmuyuan'        //填写开发者的一些基本信息
-                        name 'ouyangmuyuan'    //填写开发者的一些基本信息
-                        email '596928539@qq.com'   //填写开发者的一些基本信息
+                        id 'xiaolong20190817'        //填写开发者的一些基本信息
+                        name 'xiaolong20190817'    //填写开发者的一些基本信息
+                        email '1134208811@qq.com'   //填写开发者的一些基本信息
                     }
                 }
                 scm {
