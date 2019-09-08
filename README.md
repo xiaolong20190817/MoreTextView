@@ -9,7 +9,7 @@ allprojects {
 	}
     
     dependencies {
-	        implementation 'com.github.xiaolong20190817:MoreTextView:1.0.1'
+	    implementation 'com.github.xiaolong20190817:MoreTextView:1.0.2'
 	}
    
 # 使用方法
