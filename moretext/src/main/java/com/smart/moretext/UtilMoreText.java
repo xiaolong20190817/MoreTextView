@@ -1,6 +1,8 @@
 package com.smart.moretext;
 
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.SpannableString;
@@ -10,6 +12,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,6 +30,8 @@ public final class UtilMoreText {
     private float mExpectedWidth; //期望行宽度
     private TextView mTextView;//显示富文本的控件
     private String mOriMsg;//全部文本信息
+    private Activity mActivity;
+    private int mNum;
 
     /**
      * 是否展开
@@ -61,20 +66,26 @@ public final class UtilMoreText {
      * @param textOpen  展开性质的文字
      * @param textClose 关闭性质的文字
      */
-    public UtilMoreText(final TextView textView, String oriMsg, String textOpen, String textClose) {
+    public UtilMoreText(Activity activity , final TextView textView, String oriMsg, String textOpen, String textClose) {
         mTextView = textView;
         mOriMsg = oriMsg;
         mTextOpen = textOpen;
         mTextClose = textClose;
+        mTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,mTextView.getTextSize());
+        this.mActivity = activity;
+        mNum = getLineMaxNumber() * mLines;
     }
 
     /**
      * @param textView 文本框
      * @param oriMsg   原始文字
      */
-    public UtilMoreText(final TextView textView, String oriMsg) {
+    public UtilMoreText(Activity activity , final TextView textView, String oriMsg) {
         mTextView = textView;
         mOriMsg = oriMsg;
+        mTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,mTextView.getTextSize());
+        this.mActivity = activity;
+        mNum = getLineMaxNumber() * mLines;
     }
 
     /**
@@ -83,11 +94,14 @@ public final class UtilMoreText {
      * @param drawableOpen  展开图标
      * @param drawableColse 关闭图标
      */
-    public UtilMoreText(final TextView textView, String oriMsg, Drawable drawableOpen, Drawable drawableColse) {
+    public UtilMoreText(Activity activity , final TextView textView, String oriMsg, Drawable drawableOpen, Drawable drawableColse) {
         mTextView = textView;
         mOriMsg = oriMsg + "XX";
         mDrawableOpen = drawableOpen;
         mDrawableClose = drawableColse;
+        mTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,mTextView.getTextSize());
+        this.mActivity = activity;
+        mNum = getLineMaxNumber() * mLines;
     }
 
     private static final String TAG = "ddd";
@@ -98,7 +112,7 @@ public final class UtilMoreText {
      * @param lineNum 函数
      * @return UtilMoreText
      */
-    private UtilMoreText setLines(int lineNum) {
+    public UtilMoreText setLines(int lineNum) {
         Log.i(TAG, "setLines: " + lineNum);
         this.mLines = lineNum;
         return this;
@@ -120,9 +134,32 @@ public final class UtilMoreText {
         mTextView.setText(compressedWithImg());
     }
 
-    private UtilMoreText setExpectedWidth(float expectedWidth) {
+    public UtilMoreText setExpectedWidth(float expectedWidth) {
         this.mExpectedWidth = expectedWidth;
         return this;
+    }
+
+    /**
+     * 用  TextView  测量不同分辨率  下  一行能显示多少个字符
+     */
+    @SuppressLint("NewApi")
+    public int getLineMaxNumber() {
+        //获取用来测量的字符串的长度
+        int str_length = mOriMsg.length();
+        //获取当前字符串所占的宽度   像素单位
+        int total_str_dpi = (int) mTextView.getPaint().measureText(mOriMsg);
+        //获取每个字符   占多少像素
+        int c_dpi = total_str_dpi / str_length;
+        //获取当前   手机的分辨率   获取横坐标像素
+        DisplayMetrics displayMetrics = mActivity.getResources().getDisplayMetrics();
+        float total_dpi = displayMetrics.widthPixels;
+        //获取边距像素
+        int parding_dpi=mTextView.getTotalPaddingLeft()+mTextView.getTotalPaddingRight();
+//        int parding_dpi=0;
+        //总宽像素   减去   边距像素   等于  最终显示一行字符的像素宽度
+        int end_total_dpi=(int) total_dpi-parding_dpi;
+        //总像素宽度   处于   单个字符占的宽度像素   得到一行占多少字符
+        return  end_total_dpi / c_dpi;
     }
 
     /** 设置结尾 文字的颜色
@@ -180,7 +217,7 @@ public final class UtilMoreText {
     }
 
     private SpannableString compressedWithImg() {
-        return getSpannableImg(mOriMsg.substring(0, mOriMsg.length() >> 1), mDrawableOpen);
+        return compressedWithString1();
     }
 
     /**
@@ -189,11 +226,7 @@ public final class UtilMoreText {
      * @return 富文本字符串
      */
     private SpannableString compressedWithString() {
-        if (mOriMsg.length() == 0) {
-            return getSpannableString(mOriMsg);
-        }
-        String resultText = mOriMsg.substring(0, mOriMsg.length() >> 1) + mTextOpen;
-        return getSpannableString(resultText);
+        return compressedWithString1();
     }
 
     private SpannableString compressedWithString1() {
@@ -205,22 +238,13 @@ public final class UtilMoreText {
         TextPaint paint = mTextView.getPaint();
         paint.setTextSize(mTextView.getTextSize());
 
-        float num = mExpectedWidth * mLines;
-        if (paint.measureText(tempResultText) < num) {
+        if (paint.measureText(tempResultText) < mNum) {
             resultText = mOriMsg;
         } else {
-            boolean continuation = true;
-            int mPos = 0;
-            while (continuation) {
-                mPos++;
-                resultText = mOriMsg.substring(0, mPos);
-                float len = paint.measureText(resultText);
-                if (len > num) {
-                    continuation = false;
-                }
-            }
+            resultText = mOriMsg.substring(0,mNum);
         }
-        resultText = resultText + mTextOpen;
+        resultText = resultText.substring(0,resultText.length() -mTextOpen.length() - 4 ) + mTextOpen;
+        resultText = resultText.replace("\r","").replace("\n","");
         return getSpannableString(resultText);
     }
 
